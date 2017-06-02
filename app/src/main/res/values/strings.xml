@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Antioch Wheaton</string>
+
+    <string name="label_sermons">Sermons</string>
+    <string name="label_blog">Blog Posts</string>
+
+    <string name="refresh">Refresh</string>
+
+    <string name="error_message">Failed to retrieve data</string>
+</resources>
