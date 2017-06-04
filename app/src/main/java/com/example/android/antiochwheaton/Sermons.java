@@ -3,11 +3,14 @@ package com.example.android.antiochwheaton;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.antiochwheaton.utilities.NetworkUtils;
 import com.example.android.antiochwheaton.utilities.OpenWeatherJsonUtils;
@@ -15,9 +18,12 @@ import com.example.android.antiochwheaton.utilities.OpenWeatherJsonUtils;
 import java.io.IOException;
 import java.net.URL;
 
-public class Sermons extends AppCompatActivity {
+public class Sermons extends AppCompatActivity implements PodcastAdapter.PodcastAdapterOnClickHandler{
 
-    TextView mTextDisplayPodcasts;
+    private RecyclerView mRecyclerView;
+    private PodcastAdapter mPodcastAdapter;
+
+    Toast mToast;
     TextView mErrorTextView;
     ProgressBar mLoadingProgressBar;
 
@@ -26,11 +32,18 @@ public class Sermons extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sermons);
 
-        mTextDisplayPodcasts = (TextView)findViewById(R.id.tv_podcast_data);
+        mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview_podcasts);
+
         mErrorTextView = (TextView)findViewById(R.id.tv_error_message);
         mLoadingProgressBar = (ProgressBar)findViewById(R.id.pb_loading);
 
-        mTextDisplayPodcasts.setText("");
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+
+        mPodcastAdapter = new PodcastAdapter(this);
+
+        mRecyclerView.setAdapter(mPodcastAdapter);
 
         loadData();
     }
@@ -45,6 +58,7 @@ public class Sermons extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClicked = item.getItemId();
         if(itemClicked == R.id.action_refresh){
+            mPodcastAdapter = null;
             loadData();
             return true;
         }
@@ -54,18 +68,27 @@ public class Sermons extends AppCompatActivity {
 
     private void showPodcastDataView(){
         mErrorTextView.setVisibility(View.INVISIBLE);
-        mTextDisplayPodcasts.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showErrorMessage(){
         mErrorTextView.setVisibility(View.VISIBLE);
-        mTextDisplayPodcasts.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
     }
 
     private void loadData(){
         showPodcastDataView();
         String type = "podcast";
         new GetPodcastData().execute(NetworkUtils.buildUrl(type));
+    }
+
+    @Override
+    public void onListItemClick(String clickedItem) {
+        if(mToast != null){
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(this,clickedItem,Toast.LENGTH_LONG);
+        mToast.show();
     }
 
     private class GetPodcastData extends AsyncTask<URL,Void,String[]>{
@@ -94,9 +117,8 @@ public class Sermons extends AppCompatActivity {
         protected void onPostExecute(String[] podcastData) {
             mLoadingProgressBar.setVisibility(View.INVISIBLE);
             if (podcastData != null){
-                mTextDisplayPodcasts.setVisibility(View.VISIBLE);
-                for (String podcast : podcastData)
-                    mTextDisplayPodcasts.append(podcast + "\n\n\n");
+                showPodcastDataView();
+                mPodcastAdapter.setmPodcastData(podcastData);
             }else{
                 showErrorMessage();
             }
