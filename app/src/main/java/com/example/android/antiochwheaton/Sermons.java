@@ -1,5 +1,6 @@
 package com.example.android.antiochwheaton;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -83,12 +84,10 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
     }
 
     @Override
-    public void onListItemClick(String clickedItem) {
-        if(mToast != null){
-            mToast.cancel();
-        }
-        mToast = Toast.makeText(this,clickedItem,Toast.LENGTH_LONG);
-        mToast.show();
+    public void onListItemClick(String podcastName) {
+        Intent intent = new Intent(this,PodcastDetail.class);
+        intent.putExtra("podcast",podcastName);
+        startActivity(intent);
     }
 
     private class GetPodcastData extends AsyncTask<URL,Void,String[]>{
