@@ -2,6 +2,9 @@ package com.example.android.antiochwheaton;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +22,9 @@ import com.example.android.antiochwheaton.utilities.OpenWeatherJsonUtils;
 import java.io.IOException;
 import java.net.URL;
 
-public class Sermons extends AppCompatActivity implements PodcastAdapter.PodcastAdapterOnClickHandler{
+public class Sermons extends AppCompatActivity implements PodcastAdapter.PodcastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<String[]>{
+
+    private static final int LOADER = 0;
 
     private RecyclerView mRecyclerView;
     private PodcastAdapter mPodcastAdapter;
@@ -46,7 +51,11 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
 
         mRecyclerView.setAdapter(mPodcastAdapter);
 
-        loadData();
+        LoaderManager.LoaderCallbacks<String[]> callback = Sermons.this;
+
+        Bundle bundle = null;
+
+        getSupportLoaderManager().initLoader(LOADER,bundle,callback);
     }
 
     @Override
@@ -59,8 +68,8 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClicked = item.getItemId();
         if(itemClicked == R.id.action_refresh){
-            mPodcastAdapter = null;
-            loadData();
+            mPodcastAdapter.setmPodcastData(null);
+            getSupportLoaderManager().restartLoader(LOADER,null,this);
             return true;
         }
 
@@ -77,11 +86,6 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
         mRecyclerView.setVisibility(View.INVISIBLE);
     }
 
-    private void loadData(){
-        showPodcastDataView();
-        String type = "podcast";
-        new GetPodcastData().execute(NetworkUtils.buildUrl(type));
-    }
 
     @Override
     public void onListItemClick(String podcastName) {
@@ -90,37 +94,57 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
         startActivity(intent);
     }
 
-    private class GetPodcastData extends AsyncTask<URL,Void,String[]>{
+    @Override
+    public Loader<String[]> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<String[]>(this) {
+            String[] mPodcastData = null;
 
-        @Override
-        protected void onPreExecute() {
-            mLoadingProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected String[] doInBackground(URL... params) {
-            URL searchURL = params[0];
-            String searchResult = null;
-            try{
-                searchResult = NetworkUtils.getResponseFromHttpUrl(searchURL);
-                String[] podcastData = OpenWeatherJsonUtils.getSimplePodcastNamesFromJson(Sermons.this,searchResult);
-
-                return podcastData;
-            }catch (Exception e){
-                e.printStackTrace();
-                return null;
+            @Override
+            protected void onStartLoading() {
+                if(mPodcastData != null){
+                    deliverResult(mPodcastData);
+                }else{
+                    mLoadingProgressBar.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
             }
-        }
 
-        @Override
-        protected void onPostExecute(String[] podcastData) {
-            mLoadingProgressBar.setVisibility(View.INVISIBLE);
-            if (podcastData != null){
-                showPodcastDataView();
-                mPodcastAdapter.setmPodcastData(podcastData);
-            }else{
-                showErrorMessage();
+            @Override
+            public String[] loadInBackground() {
+                String search = "podcast";
+                URL searchURL = NetworkUtils.buildUrl(search);
+                try{
+                    String searchResult = NetworkUtils.getResponseFromHttpUrl(searchURL);
+                    String[] podcastData = OpenWeatherJsonUtils.getSimplePodcastNamesFromJson(Sermons.this,searchResult);
+
+                    return podcastData;
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return null;
+                }
             }
+
+            public void deliverResult(String[] data){
+                mPodcastData = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+        mLoadingProgressBar.setVisibility(View.INVISIBLE);
+        if(data != null){
+            showPodcastDataView();
+            mPodcastAdapter.setmPodcastData(data);
+        }else{
+            showErrorMessage();
         }
     }
+
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+
+    }
+
 }
