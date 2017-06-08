@@ -27,7 +27,7 @@ import java.net.HttpURLConnection;
 /**
  * Utility functions to handle OpenWeatherMap JSON data.
  */
-public final class OpenWeatherJsonUtils {
+public final class JsonUtils {
 
     /**
      * This method parses JSON from a web response and returns an array of Strings
@@ -51,6 +51,14 @@ public final class OpenWeatherJsonUtils {
 
         final String JSON_TITLE = "title";
         final String JSON_RENDERED = "rendered";
+        final String JSON_ID = "id";
+        final String JSON_URL = "link";
+        final String JSON_CONTENT = "content";
+        final String JSON_META = "meta";
+        final String JSON_DATE = "date_recorded";
+        final String JSON_AUDIO_FILE = "audio_file";
+        final String JSON_AUTHOR = "tags";
+
         /* String array to hold each day's weather String */
         String[] parsedData = null;
 
@@ -66,10 +74,22 @@ public final class OpenWeatherJsonUtils {
 
             JSONObject podcast = podcastJson.getJSONObject(i);
 
+            String strId = podcast.getString(JSON_ID);
             JSONObject title = podcast.getJSONObject(JSON_TITLE);
-            String rendered = title.getString(JSON_RENDERED);
+            String strTitle = title.getString(JSON_RENDERED);
 
-            parsedData[i] = rendered;
+            JSONObject meta = podcast.getJSONObject(JSON_META);
+            String strDate = meta.getString(JSON_DATE);
+            JSONArray tags = podcast.getJSONArray(JSON_AUTHOR);
+            String strAuthor = tags.getString(0);
+            JSONObject content = podcast.getJSONObject(JSON_CONTENT);
+            String strContent = AntiochUtilties.formattedImageURL(content.getString(JSON_RENDERED));
+            String podcastURL = AntiochUtilties.formattedURL(meta.getString(JSON_AUDIO_FILE));
+            String sermonURL = AntiochUtilties.formattedURL(podcast.getString(JSON_URL));
+
+
+
+            parsedData[i] = strTitle;
         }
 
         return parsedData;

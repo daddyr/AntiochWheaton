@@ -1,9 +1,10 @@
 package com.example.android.antiochwheaton;
 
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,18 +17,30 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.antiochwheaton.data.DataContract;
 import com.example.android.antiochwheaton.utilities.NetworkUtils;
-import com.example.android.antiochwheaton.utilities.OpenWeatherJsonUtils;
+import com.example.android.antiochwheaton.utilities.JsonUtils;
 
-import java.io.IOException;
 import java.net.URL;
 
-public class Sermons extends AppCompatActivity implements PodcastAdapter.PodcastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<String[]>{
+public class Sermons extends AppCompatActivity implements
+        PodcastAdapter.PodcastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<Cursor>{
+
+    String[] mProjection = new String[]{
+            DataContract.PodcastEntry.COLUMN_TITLE,
+            DataContract.PodcastEntry.COLUMN_DATE,
+            DataContract.PodcastEntry.COLUMN_IMAGE_URL
+    };
+
+    final int TITLE = 0;
+    final int DATE = 1;
+    final int IMAGE = 2;
 
     private static final int LOADER = 0;
 
     private RecyclerView mRecyclerView;
     private PodcastAdapter mPodcastAdapter;
+    private int mPosition = RecyclerView.NO_POSITION;
 
     Toast mToast;
     TextView mErrorTextView;
@@ -40,22 +53,19 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
 
         mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview_podcasts);
 
-        mErrorTextView = (TextView)findViewById(R.id.tv_error_message);
         mLoadingProgressBar = (ProgressBar)findViewById(R.id.pb_loading);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mPodcastAdapter = new PodcastAdapter(this);
+        mPodcastAdapter = new PodcastAdapter(this,this);
 
         mRecyclerView.setAdapter(mPodcastAdapter);
 
-        LoaderManager.LoaderCallbacks<String[]> callback = Sermons.this;
+        showLoading();
 
-        Bundle bundle = null;
-
-        getSupportLoaderManager().initLoader(LOADER,bundle,callback);
+        getSupportLoaderManager().initLoader(LOADER,null,this);
     }
 
     @Override
@@ -68,7 +78,6 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClicked = item.getItemId();
         if(itemClicked == R.id.action_refresh){
-            mPodcastAdapter.setmPodcastData(null);
             getSupportLoaderManager().restartLoader(LOADER,null,this);
             return true;
         }
@@ -76,13 +85,8 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
         return super.onOptionsItemSelected(item);
     }
 
-    private void showPodcastDataView(){
-        mErrorTextView.setVisibility(View.INVISIBLE);
-        mRecyclerView.setVisibility(View.VISIBLE);
-    }
-
-    private void showErrorMessage(){
-        mErrorTextView.setVisibility(View.VISIBLE);
+    private void showLoading(){
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
     }
 
@@ -95,56 +99,25 @@ public class Sermons extends AppCompatActivity implements PodcastAdapter.Podcast
     }
 
     @Override
-    public Loader<String[]> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<String[]>(this) {
-            String[] mPodcastData = null;
-
-            @Override
-            protected void onStartLoading() {
-                if(mPodcastData != null){
-                    deliverResult(mPodcastData);
-                }else{
-                    mLoadingProgressBar.setVisibility(View.VISIBLE);
-                    forceLoad();
-                }
-            }
-
-            @Override
-            public String[] loadInBackground() {
-                String search = "podcast";
-                URL searchURL = NetworkUtils.buildUrl(search);
-                try{
-                    String searchResult = NetworkUtils.getResponseFromHttpUrl(searchURL);
-                    String[] podcastData = OpenWeatherJsonUtils.getSimplePodcastNamesFromJson(Sermons.this,searchResult);
-
-                    return podcastData;
-                }catch (Exception e){
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            public void deliverResult(String[] data){
-                mPodcastData = data;
-                super.deliverResult(data);
-            }
-        };
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, DataContract.PodcastEntry.CONTENT_URI,mProjection,null,null,null);
     }
 
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] data) {
-        mLoadingProgressBar.setVisibility(View.INVISIBLE);
-        if(data != null){
-            showPodcastDataView();
-            mPodcastAdapter.setmPodcastData(data);
-        }else{
-            showErrorMessage();
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mPodcastAdapter.swapCursor(data);
+
+        if(mPosition == RecyclerView.NO_POSITION){
+            mPosition = 0;
         }
+
+        mRecyclerView.smoothScrollToPosition(mPosition);
+
     }
 
     @Override
-    public void onLoaderReset(Loader<String[]> loader) {
-
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mPodcastAdapter.swapCursor(null);
     }
 
 }

@@ -27,7 +27,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 DataContract.PodcastEntry.COLUMN_AUTHOR + " TEXT NOT NULL," +
                 DataContract.PodcastEntry.COLUMN_IMAGE_URL + " TEXT NOT NULL," +
                 DataContract.PodcastEntry.COLUMN_PODCAST_URL + " TEXT NOT NULL," +
-                DataContract.PodcastEntry.COLUMN_SUMMARY + " TEXT NOT NULL," +
+                DataContract.PodcastEntry.COLUMN_SUMMARY + " TEXT NOT NULL" +
 
                 ");";
 

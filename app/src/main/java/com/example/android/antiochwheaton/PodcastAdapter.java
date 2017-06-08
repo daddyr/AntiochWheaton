@@ -1,6 +1,7 @@
 package com.example.android.antiochwheaton;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.view.LayoutInflater;
@@ -14,7 +15,9 @@ import android.widget.TextView;
 
 public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastAdapterViewHolder> {
 
-    private String[] mPodcastData;
+
+    private final Context mContext;
+    private Cursor mCursor;
 
     final private PodcastAdapterOnClickHandler mClickHandler;
 
@@ -22,12 +25,19 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         void onListItemClick(String clickedItem);
     }
 
-    public PodcastAdapter(PodcastAdapterOnClickHandler handler){mClickHandler = handler;}
+    public PodcastAdapter(PodcastAdapterOnClickHandler handler, Context context){
+        mClickHandler = handler;
+        mContext = context;
+    }
 
     @Override
     public void onBindViewHolder(PodcastAdapter.PodcastAdapterViewHolder holder, int position) {
-        String podcastString = mPodcastData[position];
-        holder.mPodcastTextView.setText(podcastString);
+        mCursor.moveToPosition(position);
+        String id = mCursor.getString(1);
+        String title = mCursor.getString(2);
+        String imageURL = mCursor.getString(5);
+
+        holder.mPodcastTextView.setText(title);
     }
 
     @Override
@@ -44,18 +54,15 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
 
     @Override
     public int getItemCount() {
-        if(mPodcastData == null){
-            return 0;
-        }
+        if(mCursor == null) return 0;
 
-        return mPodcastData.length;
+        return mCursor.getCount();
     }
 
-    public void setmPodcastData (String[] podcastData){
-        mPodcastData = podcastData;
+    void swapCursor(Cursor newCursor){
+        mCursor = newCursor;
         notifyDataSetChanged();
     }
-
     class PodcastAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public final TextView mPodcastTextView;
 
@@ -67,8 +74,9 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
 
         @Override
         public void onClick(View v) {
-            String itemClicked = mPodcastData[getAdapterPosition()];
-            mClickHandler.onListItemClick(itemClicked);
+            int adapterPosition = getAdapterPosition();
+            String title = mPodcastTextView.getText().toString();
+            mClickHandler.onListItemClick(title);
         }
     }
 }

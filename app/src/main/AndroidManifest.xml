@@ -21,6 +21,10 @@
         </activity>
         <activity android:name=".Blog" />
         <activity android:name=".PodcastDetail"></activity>
+        <provider
+            android:authorities="com.example.android.antiochwheaton"
+            android:name="com.example.android.antiochwheaton.data.AntiochProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
