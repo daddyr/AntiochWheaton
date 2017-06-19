@@ -2,6 +2,7 @@ package com.example.android.antiochwheaton;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.antiochwheaton.data.DataContract;
+import com.example.android.antiochwheaton.sync.AntiochSyncUtils;
 import com.example.android.antiochwheaton.utilities.NetworkUtils;
 import com.example.android.antiochwheaton.utilities.JsonUtils;
 
@@ -27,14 +29,16 @@ public class Sermons extends AppCompatActivity implements
         PodcastAdapter.PodcastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<Cursor>{
 
     String[] mProjection = new String[]{
+            DataContract.PodcastEntry.COLUMN_WP_ID,
             DataContract.PodcastEntry.COLUMN_TITLE,
             DataContract.PodcastEntry.COLUMN_DATE,
             DataContract.PodcastEntry.COLUMN_IMAGE_URL
     };
 
-    final int TITLE = 0;
-    final int DATE = 1;
-    final int IMAGE = 2;
+    public static final int ID = 0;
+    public static final int TITLE = 1;
+    public static final int DATE = 2;
+    public static final int IMAGE = 3;
 
     private static final int LOADER = 0;
 
@@ -66,6 +70,8 @@ public class Sermons extends AppCompatActivity implements
         showLoading();
 
         getSupportLoaderManager().initLoader(LOADER,null,this);
+
+        AntiochSyncUtils.initialize(this);
     }
 
     @Override
@@ -78,8 +84,7 @@ public class Sermons extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemClicked = item.getItemId();
         if(itemClicked == R.id.action_refresh){
-            getSupportLoaderManager().restartLoader(LOADER,null,this);
-            return true;
+            AntiochSyncUtils.startImmediateSync(this);
         }
 
         return super.onOptionsItemSelected(item);
@@ -92,9 +97,10 @@ public class Sermons extends AppCompatActivity implements
 
 
     @Override
-    public void onListItemClick(String podcastName) {
+    public void onListItemClick(String podcastID) {
         Intent intent = new Intent(this,PodcastDetail.class);
-        intent.putExtra("podcast",podcastName);
+        Uri uriForItemClicked = DataContract.PodcastEntry.buildPodcastUriWithId(podcastID);
+        intent.setData(uriForItemClicked);
         startActivity(intent);
     }
 
@@ -112,7 +118,7 @@ public class Sermons extends AppCompatActivity implements
         }
 
         mRecyclerView.smoothScrollToPosition(mPosition);
-
+        if (data.getCount() != 0) showPodcastDataView();
     }
 
     @Override
@@ -120,4 +126,8 @@ public class Sermons extends AppCompatActivity implements
         mPodcastAdapter.swapCursor(null);
     }
 
+    private void showPodcastDataView(){
+        mLoadingProgressBar.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
 }

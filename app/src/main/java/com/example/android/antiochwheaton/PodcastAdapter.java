@@ -33,9 +33,9 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
     @Override
     public void onBindViewHolder(PodcastAdapter.PodcastAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-        String id = mCursor.getString(1);
-        String title = mCursor.getString(2);
-        String imageURL = mCursor.getString(5);
+        String date = mCursor.getString(Sermons.DATE);
+        String title = mCursor.getString(Sermons.TITLE);
+        String imageURL = mCursor.getString(Sermons.IMAGE);
 
         holder.mPodcastTextView.setText(title);
     }
@@ -75,8 +75,8 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            String title = mPodcastTextView.getText().toString();
-            mClickHandler.onListItemClick(title);
+            String id = mCursor.getString(Sermons.ID);
+            mClickHandler.onListItemClick(id);
         }
     }
 }

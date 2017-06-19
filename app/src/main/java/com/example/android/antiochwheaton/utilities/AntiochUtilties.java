@@ -20,4 +20,15 @@ public class AntiochUtilties {
         String returnString = items[12];
         return returnString;
     }
+
+    public static String formattedSummaryURL(String content){
+        String[] items = content.split("p>");
+        String s;
+        for(int i = 0;i < items.length;i++){
+            s = items[i];
+        }
+
+        String returnString = items[1];
+        return returnString;
+    }
 }

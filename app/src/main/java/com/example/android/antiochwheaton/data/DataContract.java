@@ -29,6 +29,12 @@ public class DataContract {
         public static final String COLUMN_IMAGE_URL = "image";
         public static final String COLUMN_PODCAST_URL = "podcast";
         public static final String COLUMN_SUMMARY = "summary";
+
+        public static Uri buildPodcastUriWithId(String id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(id)
+                    .build();
+        }
     }
 
 

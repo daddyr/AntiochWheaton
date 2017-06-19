@@ -25,6 +25,14 @@
             android:authorities="com.example.android.antiochwheaton"
             android:name="com.example.android.antiochwheaton.data.AntiochProvider"
             android:exported="false"/>
+        <service android:name=".sync.AntiochSyncIntentService"
+            android:exported="false"/>
+        <service android:name=".sync.AntiochFirebaseJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdspatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -18,6 +18,8 @@ package com.example.android.antiochwheaton.utilities;
 import android.content.ContentValues;
 import android.content.Context;
 
+import com.example.android.antiochwheaton.data.DataContract;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +45,7 @@ public final class JsonUtils {
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-    public static String[] getSimplePodcastNamesFromJson(Context context, String forecastJsonStr)
+    public static ContentValues[] getPodcastContenValuesNamesFromJson(Context context, String forecastJsonStr)
             throws JSONException {
 
         /* Weather information. Each day's forecast info is an element of the "list" array */
@@ -60,21 +62,20 @@ public final class JsonUtils {
         final String JSON_AUTHOR = "tags";
 
         /* String array to hold each day's weather String */
-        String[] parsedData = null;
+
 
         JSONArray podcastJson = new JSONArray(forecastJsonStr);
 
         //JSONArray array = forecastJson.getJSONArray("");
 
-
-        parsedData = new String[podcastJson.length()];
+        ContentValues[] podcastContentValues = new ContentValues[podcastJson.length()];
 
 
         for (int i = 0; i < podcastJson.length(); i++) {
 
             JSONObject podcast = podcastJson.getJSONObject(i);
 
-            String strId = podcast.getString(JSON_ID);
+            String podcastId = podcast.getString(JSON_ID);
             JSONObject title = podcast.getJSONObject(JSON_TITLE);
             String strTitle = title.getString(JSON_RENDERED);
 
@@ -88,11 +89,19 @@ public final class JsonUtils {
             String sermonURL = AntiochUtilties.formattedURL(podcast.getString(JSON_URL));
 
 
+            ContentValues podcastValues = new ContentValues();
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_WP_ID,podcastId);
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_TITLE,strTitle);
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_DATE,strDate);
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_AUTHOR,strAuthor);
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_IMAGE_URL,strContent);
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_PODCAST_URL,podcastURL);
+            podcastValues.put(DataContract.PodcastEntry.COLUMN_SUMMARY,sermonURL);
 
-            parsedData[i] = strTitle;
+            podcastContentValues[i] = podcastValues;
         }
 
-        return parsedData;
+        return podcastContentValues;
     }
 
     /**
