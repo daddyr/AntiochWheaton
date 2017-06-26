@@ -82,7 +82,9 @@ public final class JsonUtils {
             JSONObject meta = podcast.getJSONObject(JSON_META);
             String strDate = meta.getString(JSON_DATE);
             JSONArray tags = podcast.getJSONArray(JSON_AUTHOR);
-            String strAuthor = tags.getString(0);
+            String strAuthor = "";
+            if(tags != null)
+                strAuthor = tags.getString(0);
             JSONObject content = podcast.getJSONObject(JSON_CONTENT);
             String strContent = AntiochUtilties.formattedImageURL(content.getString(JSON_RENDERED));
             String podcastURL = AntiochUtilties.formattedURL(meta.getString(JSON_AUDIO_FILE));

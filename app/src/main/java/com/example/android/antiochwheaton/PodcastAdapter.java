@@ -7,7 +7,11 @@ import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.android.antiochwheaton.utilities.AntiochUtilties;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by Ryan on 6/4/2017.
@@ -18,6 +22,9 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
 
     private final Context mContext;
     private Cursor mCursor;
+
+    final int viewRecent = R.layout.podcast_list_item_recent;
+    final int viewPrevious = R.layout.podcast_list_item;
 
     final private PodcastAdapterOnClickHandler mClickHandler;
 
@@ -36,18 +43,23 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         String date = mCursor.getString(Sermons.DATE);
         String title = mCursor.getString(Sermons.TITLE);
         String imageURL = mCursor.getString(Sermons.IMAGE);
+        String author = AntiochUtilties.getAuthor(mCursor.getString(Sermons.AUTHOR));
 
-        holder.mPodcastTextView.setText(title);
+        holder.tvTitle.setText(title);
+        holder.tvDate.setText(date);
+        holder.tvAuthor.setText(author);
+        Picasso.with(mContext).load(imageURL).placeholder(R.mipmap.ic_launcher).into(holder.ivImage);
+
+
+
     }
 
     @Override
     public PodcastAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.podcast_list_item;
-        LayoutInflater inflater = LayoutInflater.from(context);
-        boolean attachImmediately = false;
 
-        View view = inflater.inflate(layoutIdForListItem,parent,attachImmediately);
+
+        View view = LayoutInflater.from(mContext)
+                .inflate(viewType,parent,false);
 
         return new PodcastAdapterViewHolder(view);
     }
@@ -59,22 +71,38 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         return mCursor.getCount();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        if(position == 0)
+            return viewRecent;
+
+        return viewPrevious;
+    }
+
     void swapCursor(Cursor newCursor){
         mCursor = newCursor;
         notifyDataSetChanged();
     }
     class PodcastAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public final TextView mPodcastTextView;
+        final TextView tvTitle;
+        final TextView tvDate;
+        final TextView tvAuthor;
+        final ImageView ivImage;
 
         public PodcastAdapterViewHolder(View itemView) {
             super(itemView);
-            mPodcastTextView = (TextView)itemView.findViewById(R.id.tv_podcast_data);
+
+            tvTitle = (TextView)itemView.findViewById(R.id.textTitle);
+            tvDate = (TextView)itemView.findViewById(R.id.textDate);
+            tvAuthor = (TextView) itemView.findViewById(R.id.textAuthor);
+            ivImage = (ImageView) itemView.findViewById(R.id.imagePodcast);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
+            mCursor.moveToPosition(adapterPosition);
             String id = mCursor.getString(Sermons.ID);
             mClickHandler.onListItemClick(id);
         }

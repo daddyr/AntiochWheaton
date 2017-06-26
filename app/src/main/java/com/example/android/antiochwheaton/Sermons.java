@@ -32,13 +32,16 @@ public class Sermons extends AppCompatActivity implements
             DataContract.PodcastEntry.COLUMN_WP_ID,
             DataContract.PodcastEntry.COLUMN_TITLE,
             DataContract.PodcastEntry.COLUMN_DATE,
-            DataContract.PodcastEntry.COLUMN_IMAGE_URL
+            DataContract.PodcastEntry.COLUMN_AUTHOR,
+            DataContract.PodcastEntry.COLUMN_IMAGE_URL,
+
     };
 
     public static final int ID = 0;
     public static final int TITLE = 1;
     public static final int DATE = 2;
-    public static final int IMAGE = 3;
+    public static final int AUTHOR = 3;
+    public static final int IMAGE = 4;
 
     private static final int LOADER = 0;
 
@@ -85,6 +88,8 @@ public class Sermons extends AppCompatActivity implements
         int itemClicked = item.getItemId();
         if(itemClicked == R.id.action_refresh){
             AntiochSyncUtils.startImmediateSync(this);
+        }else if(itemClicked == R.id.action_delete_all){
+            getContentResolver().delete(DataContract.PodcastEntry.CONTENT_URI,null,null);
         }
 
         return super.onOptionsItemSelected(item);

@@ -51,6 +51,8 @@ public class AntiochSyncUtils {
 
         sInitialized = true;
 
+        scheduleSync(context);
+
         startImmediateSync(context);
     }
     public static void startImmediateSync(Context context){

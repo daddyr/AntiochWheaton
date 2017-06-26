@@ -2,6 +2,7 @@ package com.example.android.antiochwheaton;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -13,6 +14,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.android.antiochwheaton.data.DataContract;
+import com.example.android.antiochwheaton.databinding.ActivityPodcastDetailBinding;
+import com.squareup.picasso.Picasso;
+
 
 import java.net.URL;
 
@@ -38,26 +42,21 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
 
     private static final int ID_DETAIL_LOADER = 353;
 
-    TextView mPodcastTitle;
-    TextView mPodcastDate;
-    TextView mPodcastAuthor;
-    TextView mPodcastSummary;
+
     Button mButtonListen;
 
     private Uri mUri;
 
     String mPodcastUrl;
 
+    ActivityPodcastDetailBinding mDetailBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_podcast_detail);
 
-        mPodcastTitle = (TextView)findViewById(R.id.tv_podcast_title);
-        mPodcastDate = (TextView)findViewById(R.id.tv_podcast_date);
-        mPodcastAuthor = (TextView)findViewById(R.id.tv_podcast_author);
-        mPodcastSummary = (TextView)findViewById(R.id.tv_podcast_summary);
-        mButtonListen = (Button)findViewById(R.id.button_listen);
+        mDetailBinding = DataBindingUtil.setContentView(this,R.layout.activity_podcast_detail);
+        mButtonListen = (Button)findViewById(R.id.btnDetailListen);
 
         Intent intent = getIntent();
 
@@ -96,13 +95,17 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         String date = data.getString(DATE);
         String author = data.getString(AUTHOR);
         String summary = data.getString(SUMMARY);
+        String imageUrl = data.getString(IMAGE);
+
+        mDetailBinding.tvDetailTitle.setText(title);
+        mDetailBinding.tvDetailDate.setText(date);
+        mDetailBinding.tvDetailAuthor.setText(author);
+        mDetailBinding.tvDetailDescription.setText(summary);
+        Picasso.with(this).load(imageUrl).placeholder(R.mipmap.ic_launcher).into(mDetailBinding.ivDetailImage);
 
         mPodcastUrl = data.getString(URL);
 
-        mPodcastTitle.setText(title);
-        mPodcastDate.setText(date);
-        mPodcastAuthor.setText(author);
-        mPodcastSummary.setText(summary);
+
     }
 
     @Override

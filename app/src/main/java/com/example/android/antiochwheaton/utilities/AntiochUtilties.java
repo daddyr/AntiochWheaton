@@ -31,4 +31,17 @@ public class AntiochUtilties {
         String returnString = items[1];
         return returnString;
     }
+
+    public static String getAuthor(String authorId){
+        switch (authorId){
+            case "11":
+                return "Chris Otts";
+            case "12":
+                return "Gwen Meyers";
+            case "13":
+                return "Dean Roberts";
+            default:
+                return "Guest Speaker";
+        }
+    }
 }
