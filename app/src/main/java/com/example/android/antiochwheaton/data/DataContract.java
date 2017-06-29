@@ -14,6 +14,8 @@ public class DataContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTORITY);
 
     public static final String PATH_PODCASTS = "podcasts";
+    public static final String PATH_MEDIA = "media";
+    public static final String PATH_TAGS = "tags";
 
     public static final class PodcastEntry implements BaseColumns{
 
@@ -36,6 +38,37 @@ public class DataContract {
                     .build();
         }
     }
+
+    public static final class MediaEntry implements BaseColumns{
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MEDIA).build();
+
+        public static final String TABLE_NAME = "media";
+
+        public static final String COLUMN_WP_ID = "wp_id";
+        public static final String COLUMN_URL = "url";
+
+        public static Uri buildMediaUriWithId(String id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(id)
+                    .build();
+        }
+    }
+
+    public static final class TagsEntry implements BaseColumns{
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TAGS).build();
+
+        public static final String TABLE_NAME = "tags";
+
+        public static final String COLUMN_WP_ID = "wp_id";
+        public static final String COLUMN_VALUE = "value";
+
+        public static Uri buildTagsUriWithId(String id){
+            return CONTENT_URI.buildUpon()
+                    .appendPath(id)
+                    .build();
+        }
+    }
+
 
 
 }

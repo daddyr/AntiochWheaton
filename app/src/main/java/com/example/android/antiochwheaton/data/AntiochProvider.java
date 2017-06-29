@@ -17,6 +17,10 @@ public class AntiochProvider extends ContentProvider{
 
     public static final int CODE_PODCASTS = 100;
     public static final int CODE_PODCAST_WITH_ID = 101;
+    public static final int CODE_MEDIA = 200;
+    public static final int CODE_MEDIA_WITH_ID = 201;
+    public static final int CODE_TAGS = 300;
+    public static final int CODE_TAGS_WITH_ID = 301;
 
     private static final UriMatcher sUriMatcher = buildUriMather();
 
@@ -27,9 +31,14 @@ public class AntiochProvider extends ContentProvider{
 
         uriMatcher.addURI(DataContract.CONTENT_AUTORITY,DataContract.PATH_PODCASTS,CODE_PODCASTS);
         uriMatcher.addURI(DataContract.CONTENT_AUTORITY,DataContract.PATH_PODCASTS + "/#",CODE_PODCAST_WITH_ID);
+        uriMatcher.addURI(DataContract.CONTENT_AUTORITY,DataContract.PATH_MEDIA,CODE_MEDIA);
+        uriMatcher.addURI(DataContract.CONTENT_AUTORITY,DataContract.PATH_MEDIA + "/#",CODE_MEDIA_WITH_ID);
+        uriMatcher.addURI(DataContract.CONTENT_AUTORITY,DataContract.PATH_TAGS,CODE_TAGS);
+        uriMatcher.addURI(DataContract.CONTENT_AUTORITY,DataContract.PATH_TAGS + "/#",CODE_TAGS_WITH_ID);
 
         return uriMatcher;
     }
+
     @Override
     public boolean onCreate() {
         mOpenHelper = new DbHelper(getContext());
@@ -61,12 +70,54 @@ public class AntiochProvider extends ContentProvider{
                 }
 
                 return rowsInserted;
+            case CODE_MEDIA:
+                db.beginTransaction();
+                int rowsInserted2 = 0;
+                try{
+                    for (ContentValues value:values){
+                        long _id = db.insert(DataContract.MediaEntry.TABLE_NAME,null,value);
+                        if(_id != -1){
+                            rowsInserted2++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+
+                if(rowsInserted2 > 0){
+                    getContext().getContentResolver().notifyChange(uri,null);
+                }
+
+                return rowsInserted2;
+            case CODE_TAGS:
+                db.beginTransaction();
+                int rowsInserted3 = 0;
+                try{
+                    for (ContentValues value:values){
+                        long _id = db.insert(DataContract.TagsEntry.TABLE_NAME,null,value);
+                        if(_id != -1){
+                            rowsInserted3++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+
+                if(rowsInserted3 > 0){
+                    getContext().getContentResolver().notifyChange(uri,null);
+                }
+
+                return rowsInserted3;
             default:
                 return super.bulkInsert(uri,values);
 
         }
     }
 
+    
+    //// done: 6/27/2017 add media, tags cases to query
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
@@ -92,6 +143,33 @@ public class AntiochProvider extends ContentProvider{
                         DataContract.PodcastEntry.COLUMN_WP_ID + "=?",
                         new String[]{id},null,null,sortOrder);
                 break;
+            case CODE_MEDIA:
+                cursor = db.query(DataContract.MediaEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case CODE_MEDIA_WITH_ID:
+                id = uri.getPathSegments().get(1);
+                cursor = db.query(DataContract.MediaEntry.TABLE_NAME,
+                        projection,
+                        DataContract.MediaEntry.COLUMN_WP_ID + "=?",
+                        new String[]{id},null,null,sortOrder);
+                break;
+            case CODE_TAGS:
+                cursor = db.query(DataContract.TagsEntry.TABLE_NAME,
+                        projection,selection,selectionArgs,null,null,sortOrder);
+                break;
+            case CODE_TAGS_WITH_ID:
+                id = uri.getPathSegments().get(1);
+                cursor = db.query(DataContract.TagsEntry.TABLE_NAME,
+                        projection,
+                        DataContract.TagsEntry.COLUMN_WP_ID + "=?",
+                        new String[]{id},null,null,sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: + " + uri);
         }
@@ -113,6 +191,7 @@ public class AntiochProvider extends ContentProvider{
         return null;
     }
 
+    //// done: 6/27/2017 add media, tags case to delete
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -122,6 +201,12 @@ public class AntiochProvider extends ContentProvider{
         switch (sUriMatcher.match(uri)){
             case CODE_PODCASTS:
                 tasksDeleted = db.delete(DataContract.PodcastEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case CODE_MEDIA:
+                tasksDeleted = db.delete(DataContract.MediaEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            case CODE_TAGS:
+                tasksDeleted = db.delete(DataContract.TagsEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);

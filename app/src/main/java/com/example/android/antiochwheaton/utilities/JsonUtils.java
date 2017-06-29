@@ -60,6 +60,7 @@ public final class JsonUtils {
         final String JSON_DATE = "date_recorded";
         final String JSON_AUDIO_FILE = "audio_file";
         final String JSON_AUTHOR = "tags";
+        final String JSON_MEDIA = "featured_media";
 
         /* String array to hold each day's weather String */
 
@@ -86,7 +87,7 @@ public final class JsonUtils {
             if(tags != null)
                 strAuthor = tags.getString(0);
             JSONObject content = podcast.getJSONObject(JSON_CONTENT);
-            String strContent = AntiochUtilties.formattedImageURL(content.getString(JSON_RENDERED));
+            String strContent = podcast.getString(JSON_MEDIA);
             String podcastURL = AntiochUtilties.formattedURL(meta.getString(JSON_AUDIO_FILE));
             String sermonURL = AntiochUtilties.formattedURL(podcast.getString(JSON_URL));
 
@@ -106,6 +107,78 @@ public final class JsonUtils {
         return podcastContentValues;
     }
 
+
+    public static ContentValues[] getMediaContenValuesNamesFromJson(Context context, String JsonStr)
+            throws JSONException {
+
+        /* Weather information. Each day's forecast info is an element of the "list" array */
+
+        final String JSON_ID = "id";
+        final String JSON_LINK = "rendered";
+
+        /* String array to hold each day's weather String */
+
+
+        JSONArray mediaJson = new JSONArray(JsonStr);
+
+        //JSONArray array = forecastJson.getJSONArray("");
+
+        ContentValues[] mediaContentValues = new ContentValues[mediaJson.length()];
+
+
+        for (int i = 0; i < mediaJson.length(); i++) {
+
+            JSONObject media = mediaJson.getJSONObject(i);
+
+            String mediaId = media.getString(JSON_ID);
+            String mediaLink = media.getJSONObject("guid").getString(JSON_LINK);
+
+
+            ContentValues mediaValues = new ContentValues();
+            mediaValues.put(DataContract.MediaEntry.COLUMN_WP_ID,mediaId);
+            mediaValues.put(DataContract.MediaEntry.COLUMN_URL,mediaLink);
+
+            mediaContentValues[i] = mediaValues;
+        }
+
+        return mediaContentValues;
+    }
+
+    public static ContentValues[] getTagsContenValuesNamesFromJson(Context context, String JsonStr)
+            throws JSONException {
+
+        /* Weather information. Each day's forecast info is an element of the "list" array */
+
+        final String JSON_ID = "id";
+        final String JSON_VALUE = "name";
+
+        /* String array to hold each day's weather String */
+
+
+        JSONArray tagsJson = new JSONArray(JsonStr);
+
+        //JSONArray array = forecastJson.getJSONArray("");
+
+        ContentValues[] tagsContentValues = new ContentValues[tagsJson.length()];
+
+
+        for (int i = 0; i < tagsJson.length(); i++) {
+
+            JSONObject tags = tagsJson.getJSONObject(i);
+
+            String tagsId = tags.getString(JSON_ID);
+            String tagsLink = tags.getString(JSON_VALUE);
+
+
+            ContentValues tagsValues = new ContentValues();
+            tagsValues.put(DataContract.TagsEntry.COLUMN_WP_ID,tagsId);
+            tagsValues.put(DataContract.TagsEntry.COLUMN_VALUE,tagsLink);
+
+            tagsContentValues[i] = tagsValues;
+        }
+
+        return tagsContentValues;
+    }
     /**
      * Parse the JSON and convert it into ContentValues that can be inserted into our database.
      *

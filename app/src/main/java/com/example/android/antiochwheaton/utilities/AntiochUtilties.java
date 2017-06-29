@@ -1,5 +1,10 @@
 package com.example.android.antiochwheaton.utilities;
 
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.android.antiochwheaton.data.DataContract;
+
 /**
  * Created by Ryan on 6/6/2017.
  */
@@ -32,16 +37,32 @@ public class AntiochUtilties {
         return returnString;
     }
 
-    public static String getAuthor(String authorId){
-        switch (authorId){
-            case "11":
-                return "Chris Otts";
-            case "12":
-                return "Gwen Meyers";
-            case "13":
-                return "Dean Roberts";
-            default:
-                return "Guest Speaker";
+    public static String getAuthor(Context context, String authorId){
+        Cursor tagsCursor = context.getContentResolver().query(DataContract.TagsEntry.buildTagsUriWithId(authorId),
+                new String[]{DataContract.TagsEntry.COLUMN_VALUE},null,null,null);
+
+        String author = "";
+        if(tagsCursor.moveToFirst()){
+            author = tagsCursor.getString(0);
         }
+
+        tagsCursor.close();
+
+        return author;
+    }
+
+    public static String getImageUrl(Context context, String mediaId){
+        String imageURL = "";
+
+        Cursor mediaCursor = context.getContentResolver().query(DataContract.MediaEntry.buildMediaUriWithId(mediaId),
+                new String[]{DataContract.MediaEntry.COLUMN_URL},null,null,null);
+
+        if(mediaCursor.moveToFirst()){
+            imageURL = mediaCursor.getString(0);
+        }
+
+        mediaCursor.close();
+
+        return imageURL;
     }
 }

@@ -29,12 +29,14 @@ public class AntiochSyncTask {
             int number = ids.getCount();
             ids.close();
 
-            URL podcastRequestUrl = NetworkUtils.buildUrl("podcast");
+            URL podcastRequestUrl = NetworkUtils.buildUrl(NetworkUtils.PATH_PODCAST);
 
             String jsonPodcastRespons = NetworkUtils.getResponseFromHttpUrl(podcastRequestUrl);
 
             ContentValues[] podcastValues = JsonUtils.getPodcastContenValuesNamesFromJson(context, jsonPodcastRespons);
 
+            
+            
             if(podcastValues != null && podcastValues.length != 0  && podcastValues.length > number){
                 ContentResolver contentResolver = context.getContentResolver();
 
@@ -51,6 +53,41 @@ public class AntiochSyncTask {
                         NotificationUtils.notifyUserofNewPodcast(context,id);
                     }
                 }
+            }
+            
+            ids = context.getContentResolver().query(DataContract.MediaEntry.CONTENT_URI,
+                    new String[]{DataContract.MediaEntry._ID},
+                    null,null,null);
+            number = ids.getCount();
+            ids.close();
+            
+            URL mediaRequestUrl = NetworkUtils.buildUrl(NetworkUtils.PATH_MEDIA);
+            
+            String jsonMediaRespone = NetworkUtils.getResponseFromHttpUrl(mediaRequestUrl);
+            
+            ContentValues[] mediaValues = JsonUtils.getMediaContenValuesNamesFromJson(context, jsonMediaRespone);
+            
+            if(mediaValues != null && mediaValues.length != 0 && mediaValues.length > number){
+                ContentResolver contentResolver = context.getContentResolver();
+                contentResolver.delete(DataContract.MediaEntry.CONTENT_URI,null,null);
+                contentResolver.bulkInsert(DataContract.MediaEntry.CONTENT_URI,mediaValues);
+            }
+            
+            ids = context.getContentResolver().query(DataContract.TagsEntry.CONTENT_URI,
+                    new String[]{DataContract.TagsEntry._ID},null,null,null);
+            number = ids.getCount();
+            ids.close();
+
+            URL tagsRequestUrl = NetworkUtils.buildUrl(NetworkUtils.PATH_TAGS);
+
+            String jsontagsRespone = NetworkUtils.getResponseFromHttpUrl(tagsRequestUrl);
+
+            ContentValues[] tagsValues = JsonUtils.getTagsContenValuesNamesFromJson(context, jsontagsRespone);
+
+            if(tagsValues != null && tagsValues.length != 0 && tagsValues.length > number){
+                ContentResolver contentResolver = context.getContentResolver();
+                contentResolver.delete(DataContract.TagsEntry.CONTENT_URI,null,null);
+                contentResolver.bulkInsert(DataContract.TagsEntry.CONTENT_URI,tagsValues);
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -46,6 +46,10 @@ public final class NetworkUtils {
 
     private static final String FORECAST_BASE_URL = STATIC_WEATHER_URL;
 
+    public static final String PATH_PODCAST = "podcast";
+    public static final String PATH_MEDIA = "media";
+    public static final String PATH_TAGS = "tags";
+
     /*
      * NOTE: These values only effect responses from OpenWeatherMap, NOT from the fake weather
      * server. They are simply here to allow us to teach you how to build a URL if you were to use

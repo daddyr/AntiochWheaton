@@ -15,10 +15,13 @@ import android.widget.TextView;
 
 import com.example.android.antiochwheaton.data.DataContract;
 import com.example.android.antiochwheaton.databinding.ActivityPodcastDetailBinding;
+import com.example.android.antiochwheaton.utilities.AntiochUtilties;
 import com.squareup.picasso.Picasso;
 
 
 import java.net.URL;
+//todo: use databases to get data for images and authors
+
 
 public class PodcastDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -93,15 +96,21 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
 
         String title = data.getString(TITLE);
         String date = data.getString(DATE);
-        String author = data.getString(AUTHOR);
+        String authorId = data.getString(AUTHOR);
         String summary = data.getString(SUMMARY);
-        String imageUrl = data.getString(IMAGE);
+        String imageId = data.getString(IMAGE);
 
+        String author = AntiochUtilties.getAuthor(this,authorId);
+        String imageUrl = AntiochUtilties.getImageUrl(this,imageId);
         mDetailBinding.tvDetailTitle.setText(title);
         mDetailBinding.tvDetailDate.setText(date);
         mDetailBinding.tvDetailAuthor.setText(author);
         mDetailBinding.tvDetailDescription.setText(summary);
-        Picasso.with(this).load(imageUrl).placeholder(R.mipmap.ic_launcher).into(mDetailBinding.ivDetailImage);
+        if(imageUrl == ""){
+            mDetailBinding.ivDetailImage.setImageResource(R.mipmap.ic_launcher);
+        }else {
+            Picasso.with(this).load(imageUrl).placeholder(R.mipmap.ic_launcher).into(mDetailBinding.ivDetailImage);
+        }
 
         mPodcastUrl = data.getString(URL);
 

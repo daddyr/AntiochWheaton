@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.antiochwheaton.data.DataContract;
 import com.example.android.antiochwheaton.utilities.AntiochUtilties;
 import com.squareup.picasso.Picasso;
 
@@ -37,19 +38,35 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         mContext = context;
     }
 
+    //// TODO: 6/27/2017 use databases to get author tags, and media url 
     @Override
     public void onBindViewHolder(PodcastAdapter.PodcastAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String date = mCursor.getString(Sermons.DATE);
         String title = mCursor.getString(Sermons.TITLE);
-        String imageURL = mCursor.getString(Sermons.IMAGE);
-        String author = AntiochUtilties.getAuthor(mCursor.getString(Sermons.AUTHOR));
+        String imageID = mCursor.getString(Sermons.IMAGE);
+        String authorID = mCursor.getString(Sermons.AUTHOR);
+
+        String author = AntiochUtilties.getAuthor(mContext,authorID);
+
+
+
+        String imageURL = AntiochUtilties.getImageUrl(mContext,imageID);
+
 
         holder.tvTitle.setText(title);
         holder.tvDate.setText(date);
         holder.tvAuthor.setText(author);
-        Picasso.with(mContext).load(imageURL).placeholder(R.mipmap.ic_launcher).into(holder.ivImage);
 
+        if(imageURL == ""){
+            holder.ivImage.setImageResource(R.mipmap.ic_launcher);
+        }else {
+            Picasso.with(mContext)
+                    .load(imageURL)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(holder.ivImage);
+        }
 
 
     }
