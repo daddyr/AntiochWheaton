@@ -1,9 +1,14 @@
 package com.example.android.antiochwheaton;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.IBinder;
+import android.os.PersistableBundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -11,10 +16,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.antiochwheaton.data.DataContract;
 import com.example.android.antiochwheaton.databinding.ActivityPodcastDetailBinding;
+import com.example.android.antiochwheaton.media.MediaPlayerService;
 import com.example.android.antiochwheaton.utilities.AntiochUtilties;
 import com.squareup.picasso.Picasso;
 
@@ -45,8 +52,15 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
 
     private static final int ID_DETAIL_LOADER = 353;
 
+    private boolean firstClick = true;
 
     Button mButtonListen;
+    ImageButton mPlayButton;
+    ImageButton mSkipForwardButton;
+    ImageButton mSkipBackwardButton;
+
+
+    String imageUrl;
 
     private Uri mUri;
 
@@ -54,12 +68,17 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
 
     ActivityPodcastDetailBinding mDetailBinding;
 
+    private MediaPlayerService player;
+    boolean serviceBound = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mDetailBinding = DataBindingUtil.setContentView(this,R.layout.activity_podcast_detail);
-        mButtonListen = (Button)findViewById(R.id.btnDetailListen);
+        mPlayButton = (ImageButton)findViewById(R.id.play_button);
+        mSkipBackwardButton = (ImageButton)findViewById(R.id.skip_back_button);
+        mSkipForwardButton = (ImageButton)findViewById(R.id.skip_forward_button);
 
         Intent intent = getIntent();
 
@@ -69,6 +88,51 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putBoolean("ServiceState",serviceBound);
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        serviceBound = savedInstanceState.getBoolean("ServiceState");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(serviceBound){
+            unbindService(serviceConnection);
+            player.stopSelf();
+        }
+    }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
+            player = binder.getService();
+            serviceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+        }
+    };
+
+
+    private void playAudio(String media){
+        if(!serviceBound){
+            Intent playerIntent = new Intent(this, MediaPlayerService.class);
+            playerIntent.putExtra("media",media);
+            playerIntent.putExtra("image",imageUrl);
+            startService(playerIntent);
+            bindService(playerIntent,serviceConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id){
@@ -101,7 +165,7 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         String imageId = data.getString(IMAGE);
 
         String author = AntiochUtilties.getAuthor(this,authorId);
-        String imageUrl = AntiochUtilties.getImageUrl(this,imageId);
+        imageUrl = AntiochUtilties.getImageUrl(this,imageId);
         mDetailBinding.tvDetailTitle.setText(title);
         mDetailBinding.tvDetailDate.setText(date);
         mDetailBinding.tvDetailAuthor.setText(author);
@@ -123,8 +187,28 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
     }
 
     public void onListenClick(View view){
-        Uri podcast = Uri.parse(mPodcastUrl);
-        Intent intent = new Intent(Intent.ACTION_VIEW,podcast);
-        startActivity(intent);
+        if(firstClick){
+            playAudio(mPodcastUrl);
+            firstClick = false;
+            mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+        }else {
+            if (player.getStatus()) {
+                player.pauseMedia();
+                mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+            }else{
+                player.resumeMedia();
+                mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+            }
+        }
+    }
+
+    public void onSkipForward(View view){
+        if(player.getStatus())
+            player.skipToNext();
+    }
+
+    public void onSkipBackward(View view){
+        if(player.getStatus())
+            player.skipToPrevious();
     }
 }

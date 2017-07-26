@@ -26,6 +26,7 @@ public class AntiochUtilties {
         return returnString;
     }
 
+
     public static String formattedSummaryURL(String content){
         String[] items = content.split("p>");
         String s;
@@ -64,5 +65,24 @@ public class AntiochUtilties {
         mediaCursor.close();
 
         return imageURL;
+    }
+
+    public static String getFormattedDate(String date){
+        String[] dates = date.split("-");
+
+        String months[] = new String[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
+        int dayInt = Integer.valueOf(dates[0]);
+        int monthInt = Integer.valueOf(dates[1]);
+        String year = dates[2];
+        String month = months[monthInt];
+
+        String newdate = month + " " + String.valueOf(dayInt) + ", " + year;
+
+        return newdate;
+
+    }
+
+    public static String getFormattedSummary(String oldSummary){
+       return oldSummary.substring(3,oldSummary.length()-6);
     }
 }

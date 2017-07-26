@@ -56,6 +56,7 @@ public final class JsonUtils {
         final String JSON_ID = "id";
         final String JSON_URL = "link";
         final String JSON_CONTENT = "content";
+        final String JSON_EXERPT = "excerpt";
         final String JSON_META = "meta";
         final String JSON_DATE = "date_recorded";
         final String JSON_AUDIO_FILE = "audio_file";
@@ -81,7 +82,7 @@ public final class JsonUtils {
             String strTitle = title.getString(JSON_RENDERED);
 
             JSONObject meta = podcast.getJSONObject(JSON_META);
-            String strDate = meta.getString(JSON_DATE);
+            String strDate = AntiochUtilties.getFormattedDate(meta.getString(JSON_DATE));
             JSONArray tags = podcast.getJSONArray(JSON_AUTHOR);
             String strAuthor = "";
             if(tags != null)
@@ -89,8 +90,7 @@ public final class JsonUtils {
             JSONObject content = podcast.getJSONObject(JSON_CONTENT);
             String strContent = podcast.getString(JSON_MEDIA);
             String podcastURL = AntiochUtilties.formattedURL(meta.getString(JSON_AUDIO_FILE));
-            String sermonURL = AntiochUtilties.formattedURL(podcast.getString(JSON_URL));
-
+            String sermonURL = AntiochUtilties.getFormattedSummary(podcast.getJSONObject(JSON_EXERPT).getString(JSON_RENDERED));
 
             ContentValues podcastValues = new ContentValues();
             podcastValues.put(DataContract.PodcastEntry.COLUMN_WP_ID,podcastId);
