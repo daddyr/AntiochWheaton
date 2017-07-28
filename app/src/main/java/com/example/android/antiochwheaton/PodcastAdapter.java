@@ -42,10 +42,10 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
     @Override
     public void onBindViewHolder(PodcastAdapter.PodcastAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-        String date = mCursor.getString(Sermons.DATE);
-        String title = mCursor.getString(Sermons.TITLE);
-        String imageID = mCursor.getString(Sermons.IMAGE);
-        String authorID = mCursor.getString(Sermons.AUTHOR);
+        String date = mCursor.getString(SermonFragment.DATE);
+        String title = mCursor.getString(SermonFragment.TITLE);
+        String imageID = mCursor.getString(SermonFragment.IMAGE);
+        String authorID = mCursor.getString(SermonFragment.AUTHOR);
 
         String author = AntiochUtilties.getAuthor(mContext,authorID);
 
@@ -120,7 +120,7 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            String id = mCursor.getString(Sermons.ID);
+            String id = mCursor.getString(SermonFragment.ID);
             mClickHandler.onListItemClick(id);
         }
     }

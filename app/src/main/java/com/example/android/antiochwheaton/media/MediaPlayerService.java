@@ -389,6 +389,11 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
     }
 
+    private Target loadTarget;
+    private Bitmap image;
+
+
+
     private void buildNotification(PlaybackStatus playbackStatus){
         int notificationAction = android.R.drawable.ic_media_pause;
         PendingIntent play_pauseAction = null;
@@ -401,17 +406,28 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             play_pauseAction = playbackAction(0);
         }
 
-        Bitmap largeIcon = null;
-
         if(imageUrl == ""){
-            largeIcon = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
-        }else {
-            try {
-                largeIcon = Picasso.with(this).load(imageUrl).placeholder(R.mipmap.ic_launcher).error(R.mipmap.ic_launcher).get();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+            image = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
+        }else{
+            Picasso.with(this).load(imageUrl).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    image = bitmap;
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
         }
+
+        final Bitmap largeIcon = image;
 
         NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                 .setShowWhen(false)
