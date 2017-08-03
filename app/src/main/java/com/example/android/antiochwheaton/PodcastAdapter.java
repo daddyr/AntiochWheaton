@@ -38,7 +38,7 @@ public class PodcastAdapter extends RecyclerView.Adapter<PodcastAdapter.PodcastA
         mContext = context;
     }
 
-    //// TODO: 6/27/2017 use databases to get author tags, and media url 
+    //// DONE: 6/27/2017 use databases to get author tags, and media url
     @Override
     public void onBindViewHolder(PodcastAdapter.PodcastAdapterViewHolder holder, int position) {
         mCursor.moveToPosition(position);

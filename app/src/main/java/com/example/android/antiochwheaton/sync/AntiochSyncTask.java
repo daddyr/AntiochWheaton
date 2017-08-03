@@ -37,7 +37,7 @@ public class AntiochSyncTask {
 
             
             
-            if(podcastValues != null && podcastValues.length != 0  && podcastValues.length > number){
+            if(number == number){
                 ContentResolver contentResolver = context.getContentResolver();
 
                 contentResolver.delete(DataContract.PodcastEntry.CONTENT_URI,null,null);
@@ -67,7 +67,7 @@ public class AntiochSyncTask {
             
             ContentValues[] mediaValues = JsonUtils.getMediaContenValuesNamesFromJson(context, jsonMediaRespone);
             
-            if(mediaValues != null && mediaValues.length != 0 && mediaValues.length > number){
+            if(number == number){
                 ContentResolver contentResolver = context.getContentResolver();
                 contentResolver.delete(DataContract.MediaEntry.CONTENT_URI,null,null);
                 contentResolver.bulkInsert(DataContract.MediaEntry.CONTENT_URI,mediaValues);

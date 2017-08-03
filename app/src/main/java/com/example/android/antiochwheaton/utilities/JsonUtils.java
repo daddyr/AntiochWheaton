@@ -107,6 +107,66 @@ public final class JsonUtils {
         return podcastContentValues;
     }
 
+    public static ContentValues[] getPostsContenValuesNamesFromJson(Context context, String forecastJsonStr)
+            throws JSONException {
+
+        /* Weather information. Each day's forecast info is an element of the "list" array */
+
+
+        final String JSON_TITLE = "title";
+        final String JSON_RENDERED = "rendered";
+        final String JSON_ID = "id";
+        final String JSON_CONTENT = "content";
+        final String JSON_META = "meta";
+        final String JSON_DATE = "date";
+        final String JSON_AUTHOR = "author";
+        final String JSON_MEDIA = "featured_media";
+
+        /* String array to hold each day's weather String */
+
+
+        JSONArray postJson = new JSONArray(forecastJsonStr);
+
+        //JSONArray array = forecastJson.getJSONArray("");
+
+        ContentValues[] postContentValues = new ContentValues[postJson.length()];
+
+
+        for (int i = 0; i < postJson.length(); i++) {
+
+            JSONObject post = postJson.getJSONObject(i);
+
+            String podcastId = post.getString(JSON_ID);
+            JSONObject title = post.getJSONObject(JSON_TITLE);
+            String strTitle = title.getString(JSON_RENDERED);
+
+            JSONObject meta = post.getJSONObject(JSON_META);
+            String strDate = AntiochUtilties.getFormattedDate(meta.getString(JSON_DATE));
+            String tags = post.getString(JSON_AUTHOR);
+            String strAuthor = "";
+            JSONObject content = post.getJSONObject(JSON_CONTENT);
+            String strContent = post.getString(JSON_RENDERED);
+            String media = post.getString(JSON_MEDIA);
+
+            ContentValues postValues = new ContentValues();
+            postValues.put(DataContract.BlogEntry.COLUMN_WP_ID,podcastId);
+            postValues.put(DataContract.BlogEntry.COLUMN_TITLE,strTitle);
+            postValues.put(DataContract.BlogEntry.COLUMN_DATE,strDate);
+            postValues.put(DataContract.BlogEntry.COLUMN_AUTHOR,strAuthor);
+            postValues.put(DataContract.BlogEntry.COLUMN_IMAGE_URL,media);
+            postValues.put(DataContract.BlogEntry.COLUMN_CONTENT,strContent);
+
+
+            postContentValues[i] = postValues;
+        }
+
+        return postContentValues;
+    }
+
+    //todo: finish events fetch method
+    public static ContentValues[] getEventsContentValuesNamesFromJson(Context context, String JsonStr){
+        return  null;
+    }
 
     public static ContentValues[] getMediaContenValuesNamesFromJson(Context context, String JsonStr)
             throws JSONException {
@@ -179,16 +239,6 @@ public final class JsonUtils {
 
         return tagsContentValues;
     }
-    /**
-     * Parse the JSON and convert it into ContentValues that can be inserted into our database.
-     *
-     * @param context         An application context, such as a service or activity context.
-     * @param forecastJsonStr The JSON to parse into ContentValues.
-     *
-     * @return An array of ContentValues parsed from the JSON.
-     */
-    public static ContentValues[] getFullWeatherDataFromJson(Context context, String forecastJsonStr) {
-        /** This will be implemented in a future lesson **/
-        return null;
-    }
+
+
 }

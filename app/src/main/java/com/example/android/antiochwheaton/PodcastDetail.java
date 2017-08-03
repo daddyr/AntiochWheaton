@@ -27,7 +27,7 @@ import com.squareup.picasso.Picasso;
 
 
 import java.net.URL;
-//todo: use databases to get data for images and authors
+//done: use databases to get data for images and authors
 
 
 public class PodcastDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {

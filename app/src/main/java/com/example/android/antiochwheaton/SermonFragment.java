@@ -82,10 +82,6 @@ public class SermonFragment extends Fragment implements
 
         showLoading();
 
-
-
-        AntiochSyncUtils.initialize(getContext());
-
         return rootView;
     }
 
@@ -93,7 +89,7 @@ public class SermonFragment extends Fragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getLoaderManager().initLoader(LOADER,null,this);
+        getActivity().getSupportLoaderManager().initLoader(LOADER,null,this);
     }
 
     @Override
