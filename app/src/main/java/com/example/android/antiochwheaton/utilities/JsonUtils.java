@@ -107,7 +107,7 @@ public final class JsonUtils {
         return podcastContentValues;
     }
 
-    public static ContentValues[] getPostsContenValuesNamesFromJson(Context context, String forecastJsonStr)
+    public static ContentValues[] getPostsContentValuesNamesFromJson(Context context, String forecastJsonStr)
             throws JSONException {
 
         /* Weather information. Each day's forecast info is an element of the "list" array */
@@ -164,8 +164,62 @@ public final class JsonUtils {
     }
 
     //todo: finish events fetch method
-    public static ContentValues[] getEventsContentValuesNamesFromJson(Context context, String JsonStr){
-        return  null;
+    public static ContentValues[] getEventsContentValuesNamesFromJson(Context context, String JsonStr)
+        throws JSONException{
+        
+        final String JSON_TITLE = "title";
+        final String JSON_RENDERED = "rendered";
+        final String JSON_ID = "id";
+        final String JSON_CONTENT = "description";
+        final String JSON_START = "start_date";
+        final String JSON_END = "end_date";
+        final String JSON_IMAGE = "image";
+        final String JSON_VENUE = "venue";
+        final String JSON_ADDRESS = "address";
+        final String JSON_CITY = "city";
+        final String JSON_ZIP = "zip";
+
+        /* String array to hold each day's weather String */
+
+
+        JSONArray eventsJson = new JSONArray(JsonStr);
+
+        //JSONArray array = forecastJson.getJSONArray("");
+
+        ContentValues[] eventsContentValues = new ContentValues[eventsJson.length()];
+
+        // TODO: 8/21/2017 finish get object for events 
+        for (int i = 0; i < eventsJson.length(); i++) {
+
+            JSONObject events = eventsJson.getJSONObject(i);
+
+            String podcastId = events.getString(JSON_ID);
+            String strTitle = events.getString(JSON_TITLE);
+            String startDate = events.getString(JSON_START);
+            String endDate = events.getString(JSON_END);
+            String imageID = events.getJSONObject(JSON_IMAGE).getString(JSON_ID);
+            String content = events.getString(JSON_CONTENT);
+            JSONObject venue = events.getJSONObject(JSON_VENUE);
+            String address = venue.getString(JSON_ADDRESS);
+            String city = venue.getString(JSON_CITY);
+            String zip = venue.getString(JSON_ZIP);
+
+            ContentValues eventsValues = new ContentValues();
+            eventsValues.put(DataContract.EventsEntry.COLUMN_WP_ID,podcastId);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_TITLE,strTitle);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_START_DATE,startDate);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_END_DATE,endDate);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_IMAGE,imageID);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_CONTENT,content);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_ADDRESS,address);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_CITY,city);
+            eventsValues.put(DataContract.EventsEntry.COLUMN_ZIP,zip);
+
+
+            eventsContentValues[i] = eventsValues;
+        }
+
+        return eventsContentValues;
     }
 
     public static ContentValues[] getMediaContenValuesNamesFromJson(Context context, String JsonStr)

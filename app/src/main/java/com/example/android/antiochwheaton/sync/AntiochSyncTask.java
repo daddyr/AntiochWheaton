@@ -89,6 +89,43 @@ public class AntiochSyncTask {
                 contentResolver.delete(DataContract.TagsEntry.CONTENT_URI,null,null);
                 contentResolver.bulkInsert(DataContract.TagsEntry.CONTENT_URI,tagsValues);
             }
+
+            // Done: 8/21/2017 sync blogs
+            ids = context.getContentResolver().query(DataContract.BlogEntry.CONTENT_URI,
+                    new String[]{DataContract.BlogEntry._ID},null,null,null);
+            number = ids.getCount();
+            ids.close();
+
+            URL blogRequestUrl = NetworkUtils.buildUrl(NetworkUtils.PATH_BLOGS);
+
+            String jsonBlogRespone = NetworkUtils.getResponseFromHttpUrl(blogRequestUrl);
+
+            ContentValues[] blogsValues = JsonUtils.getPostsContentValuesNamesFromJson(context, jsonBlogRespone);
+
+            if(blogsValues != null && blogsValues.length != 0 && blogsValues.length > number){
+                ContentResolver contentResolver = context.getContentResolver();
+                contentResolver.delete(DataContract.BlogEntry.CONTENT_URI,null,null);
+                contentResolver.bulkInsert(DataContract.BlogEntry.CONTENT_URI,blogsValues);
+            }
+            // Done: 8/21/2017 sync events
+
+            ids = context.getContentResolver().query(DataContract.EventsEntry.CONTENT_URI,
+                    new String[]{DataContract.EventsEntry._ID},null,null,null);
+            number = ids.getCount();
+            ids.close();
+
+            URL eventsRequestUrl = NetworkUtils.buildUrl(NetworkUtils.PATH_EVENTS);
+
+            String jsoneventsRespone = NetworkUtils.getResponseFromHttpUrl(eventsRequestUrl);
+
+            ContentValues[] eventsValues = JsonUtils.getEventsContentValuesNamesFromJson(context, jsoneventsRespone);
+
+            if(eventsValues != null && eventsValues.length != 0 && eventsValues.length > number){
+                ContentResolver contentResolver = context.getContentResolver();
+                contentResolver.delete(DataContract.EventsEntry.CONTENT_URI,null,null);
+                contentResolver.bulkInsert(DataContract.EventsEntry.CONTENT_URI,eventsValues);
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }

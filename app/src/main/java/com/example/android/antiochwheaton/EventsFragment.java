@@ -11,8 +11,8 @@ import android.view.ViewGroup;
  * Created by ryan_ on 7/25/2017.
  */
 
-public class FragmentThree extends Fragment {
-    public FragmentThree() {
+public class EventsFragment extends Fragment {
+    public EventsFragment() {
 
     }
 

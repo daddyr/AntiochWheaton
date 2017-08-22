@@ -46,9 +46,11 @@ public final class NetworkUtils {
 
     private static final String FORECAST_BASE_URL = STATIC_WEATHER_URL;
 
-    public static final String PATH_PODCAST = "podcast";
-    public static final String PATH_MEDIA = "media";
-    public static final String PATH_TAGS = "tags";
+    public static final String PATH_PODCAST = "wp/v2/podcast";
+    public static final String PATH_MEDIA = "wp/v2/media";
+    public static final String PATH_TAGS = "wp/v2/tags";
+    public static final String PATH_BLOGS = "wp/v2/posts";
+    public static final String PATH_EVENTS = "trive/events/v1/events";
 
     /*
      * NOTE: These values only effect responses from OpenWeatherMap, NOT from the fake weather
@@ -67,7 +69,7 @@ public final class NetworkUtils {
      * @return The URL to use to query typehe weather server.
      */
     public static URL buildUrl(String type) {
-        // TODO (1) Fix this method to return the URL used to query Open Weather Map's API
+        // Done (1) Fix this method to return the URL used to query Open Weather Map's API
         String URL = FORECAST_BASE_URL + type + "/";
         Uri dataUri = Uri.parse(URL);
 

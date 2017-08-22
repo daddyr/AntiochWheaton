@@ -16,6 +16,9 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
+    // TODO: 8/21/2017 create blogs fragment
+    // TODO: 8/21/2017 create events fragment
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +29,9 @@ public class MainActivity extends FragmentActivity {
 
         adapter.addFragment(new AboutFragment(), "ABOUT");
         adapter.addFragment(new SermonFragment(), "SERMONS");
+        adapter.addFragment(new BlogFragment(),"BLOG");
+        adapter.addFragment(new EventsFragment(), "Events");
+
 
 
         viewPager.setAdapter(adapter);

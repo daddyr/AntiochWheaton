@@ -13,8 +13,10 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.MediaSessionManager;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -42,6 +44,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private MediaPlayer mediaPlayer;
     private String mediaFile;
     private int resumePosition;
+    WifiManager.WifiLock wifiLock;
 
     private AudioManager audioManager;
 
@@ -78,6 +81,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     public void onCreate() {
         super.onCreate();
 
+
         callStateListener();
         registerBecomingNoisyReceiver();
     }
@@ -91,6 +95,11 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         mediaPlayer.setOnSeekCompleteListener(this);
         mediaPlayer.setOnInfoListener(this);
         mediaPlayer.reset();
+        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+
+
+        wifiLock = ((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
+        wifiLock.acquire();
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try{
@@ -285,6 +294,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         if(mediaPlayer != null){
             stopMedia();
             mediaPlayer.release();
+        }
+        if(wifiLock!= null){
+            wifiLock.release();
         }
         removeAudioFocus();
 

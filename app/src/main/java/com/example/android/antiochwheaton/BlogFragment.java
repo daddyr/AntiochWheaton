@@ -11,8 +11,8 @@ import android.view.ViewGroup;
  * Created by ryan_ on 7/25/2017.
  */
 
-public class FragmentTwo extends Fragment {
-    public FragmentTwo() {
+public class BlogFragment extends Fragment {
+    public BlogFragment() {
 
     }
 
