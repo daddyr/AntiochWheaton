@@ -177,11 +177,12 @@ public final class JsonUtils {
         final String JSON_ADDRESS = "address";
         final String JSON_CITY = "city";
         final String JSON_ZIP = "zip";
+        final String JSON_EVENTS = "events";
 
         /* String array to hold each day's weather String */
 
-
-        JSONArray eventsJson = new JSONArray(JsonStr);
+        JSONObject object = new JSONObject(JsonStr);
+        JSONArray eventsJson = object.getJSONArray(JSON_EVENTS);
 
         //JSONArray array = forecastJson.getJSONArray("");
 

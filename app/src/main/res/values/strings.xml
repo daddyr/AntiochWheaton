@@ -17,4 +17,5 @@
     <string name="play_context">Play Audio</string>
     <string name="skip_forward_context">Skip Forward 5 Seconds</string>
     <string name="skip_backward_context">Skip Backward 3 Seconds</string>
+    <string name="no_events">No Upcoming Events</string>
 </resources>

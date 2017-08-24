@@ -50,7 +50,7 @@ public final class NetworkUtils {
     public static final String PATH_MEDIA = "wp/v2/media";
     public static final String PATH_TAGS = "wp/v2/tags";
     public static final String PATH_BLOGS = "wp/v2/posts";
-    public static final String PATH_EVENTS = "trive/events/v1/events";
+    public static final String PATH_EVENTS = "tribe/events/v1/events";
 
     /*
      * NOTE: These values only effect responses from OpenWeatherMap, NOT from the fake weather

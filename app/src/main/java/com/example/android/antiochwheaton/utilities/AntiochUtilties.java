@@ -43,6 +43,42 @@ public class AntiochUtilties {
         return imageURL;
     }
 
+    public static String getFormattedEventDate(String startDate){
+        String start[] = startDate.split(" ");
+
+        return  getFormattedJsonDate(start[0]) + " " + getFormattedTime(start[1]);
+    }
+
+    public static String getFormattedEventDate(String startDate,String endDate){
+        String start[] = startDate.split(" ");
+        String end[] = endDate.split(" ");
+        String returnString = "";
+        if(start[0].equals(end[0])){
+            returnString += getFormattedJsonDate(start[0]);
+            returnString += " " + getFormattedTime(start[1]);
+            returnString += " - " + getFormattedTime(end[1]);
+        } else{
+            returnString += getFormattedJsonDate(start[0]);
+            returnString += " " + getFormattedTime(start[1]);
+            returnString += " - " + getFormattedJsonDate(end[0]) + " " + getFormattedTime(end[1]);
+        }
+
+        return  returnString;
+    }
+
+    static String getFormattedTime(String time){
+        String[] times = time.split(":");
+        int hour = Integer.valueOf(times[0]);
+        String AMPM;
+        if(hour>12) {
+            AMPM = "PM";
+            hour  -= 12;
+        } else
+            AMPM = "AM";
+
+        return String.valueOf(hour) + ":" + times[1] + " " + AMPM;
+
+    }
     //formatted date for meta only
     static String getFormattedDate(String date){
         String[] dates = date.split("-");
