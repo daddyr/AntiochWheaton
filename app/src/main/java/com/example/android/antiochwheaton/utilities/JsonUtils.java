@@ -140,19 +140,18 @@ public final class JsonUtils {
             JSONObject title = post.getJSONObject(JSON_TITLE);
             String strTitle = title.getString(JSON_RENDERED);
 
-            JSONObject meta = post.getJSONObject(JSON_META);
-            String strDate = AntiochUtilties.getFormattedDate(meta.getString(JSON_DATE));
+
+            String strDate = AntiochUtilties.getFormattedJsonDate(post.getString(JSON_DATE));
             String tags = post.getString(JSON_AUTHOR);
-            String strAuthor = "";
             JSONObject content = post.getJSONObject(JSON_CONTENT);
-            String strContent = post.getString(JSON_RENDERED);
+            String strContent = content.getString(JSON_RENDERED);
             String media = post.getString(JSON_MEDIA);
 
             ContentValues postValues = new ContentValues();
             postValues.put(DataContract.BlogEntry.COLUMN_WP_ID,podcastId);
             postValues.put(DataContract.BlogEntry.COLUMN_TITLE,strTitle);
             postValues.put(DataContract.BlogEntry.COLUMN_DATE,strDate);
-            postValues.put(DataContract.BlogEntry.COLUMN_AUTHOR,strAuthor);
+            postValues.put(DataContract.BlogEntry.COLUMN_AUTHOR,tags);
             postValues.put(DataContract.BlogEntry.COLUMN_IMAGE_URL,media);
             postValues.put(DataContract.BlogEntry.COLUMN_CONTENT,strContent);
 

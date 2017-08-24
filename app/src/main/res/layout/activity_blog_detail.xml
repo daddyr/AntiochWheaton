@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.example.android.antiochwheaton.BlogDetail">
+
+
+            <ImageView
+                android:id="@+id/ivBlogDetailImage"
+                android:layout_width="368dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/ic_launcher"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvBlogDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/ivBlogDetailImage"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:textSize="20sp"
+                tools:text="Friend of God: 21 Days in the Gospel of John"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:id="@+id/tvBlogDetailContent"
+                android:layout_width="368dp"
+                android:layout_height="wrap_content"
+                tools:text="In John 1 Jesus extends an invitation that has never been withdrawn. In His invitation he simply said, “Come”. With that simple invitation an opportunity has been placed before each one of us to become a friend of God. This invitation that has been extended before us is waiting for a response. Waiting for people just like you and me to give our RSVP.
+        Yesterday morning we began a new series entitled, Friend of God. Over the three weeks of this series our aim is to make friendship with God our highest priority. To help us focus in this time we will be reading through the Gospel of John together. We don't read to check off boxes of religious approval. We read because we want to know God and we long to be known by Him.
+        He has extended and invitation to come and see what God is like, to discover what God is doing, and to hear how much God loves us. We read because as Dr. Brian Simmons, author of the Passion Translation says,"
+                app:layout_constraintTop_toBottomOf="@+id/tvBlogDetailTitle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+</layout>

@@ -17,7 +17,7 @@
             tools:text="Colossians 1"
             android:textSize="40sp"
             android:textStyle="bold"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="8dp"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginTop="8dp"
             app:layout_constraintTop_toBottomOf="@+id/ivDetailImage"
@@ -74,7 +74,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:onClick="onListenClick"
-            app:layout_constraintHorizontal_bias="0.475" />
+            app:layout_constraintHorizontal_bias="0.475"
+            android:contentDescription="@string/play_context" />
 
         <ImageButton
             android:id="@+id/skip_back_button"
@@ -85,7 +86,8 @@
             app:layout_constraintTop_toTopOf="@+id/play_button"
             app:layout_constraintRight_toLeftOf="@+id/play_button"
             android:layout_marginRight="8dp"
-            android:layout_marginEnd="8dp" />
+            android:layout_marginEnd="8dp"
+            android:contentDescription="@string/skip_backward_context" />
 
         <ImageButton
             android:id="@+id/skip_forward_button"
@@ -96,6 +98,41 @@
             app:layout_constraintTop_toTopOf="@+id/play_button"
             app:layout_constraintLeft_toRightOf="@+id/play_button"
             android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp" />
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/skip_forward_context" />
+
+        <TextView
+            android:id="@+id/textCurrentPlayTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/play_button"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/time_zero"/>
+        <TextView
+            android:id="@+id/textDurationPlayTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="10dp"
+            app:layout_constraintTop_toBottomOf="@+id/play_button"
+            android:layout_marginTop="10dp"
+            android:text="@string/time_zero"/>
+
+        <SeekBar
+            android:id="@+id/seek_bar_podcast"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/play_button"
+            android:layout_marginTop="10dp"
+            app:layout_constraintLeft_toRightOf="@+id/textCurrentPlayTime"
+            app:layout_constraintRight_toLeftOf="@id/textDurationPlayTime"
+            android:layout_marginRight="0dp"
+            android:layout_marginLeft="0dp"
+            android:max="100"/>
+
+
     </android.support.constraint.ConstraintLayout>
 </layout>

@@ -54,7 +54,7 @@ public class DataContract {
         public static final String COLUMN_CONTENT = "content";
         public static final String COLUMN_IMAGE_URL = "image";
 
-        public static Uri buildPodcastUriWithId(String id) {
+        public static Uri buildUriWithId(String id) {
             return CONTENT_URI.buildUpon()
                     .appendPath(id)
                     .build();
@@ -77,7 +77,7 @@ public class DataContract {
         public static final String COLUMN_CITY = "city";
         public static final String COLUMN_ZIP = "zip";
 
-        public static Uri buildPodcastUriWithId(String id) {
+        public static Uri buildUriWithId(String id) {
             return CONTENT_URI.buildUpon()
                     .appendPath(id)
                     .build();

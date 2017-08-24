@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.support.v4.app.LoaderManager;
@@ -15,8 +16,8 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.android.antiochwheaton.data.DataContract;
@@ -24,11 +25,6 @@ import com.example.android.antiochwheaton.databinding.ActivityPodcastDetailBindi
 import com.example.android.antiochwheaton.media.MediaPlayerService;
 import com.example.android.antiochwheaton.utilities.AntiochUtilties;
 import com.squareup.picasso.Picasso;
-
-
-import java.net.URL;
-//done: use databases to get data for images and authors
-
 
 public class PodcastDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -42,7 +38,6 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
             DataContract.PodcastEntry.COLUMN_SUMMARY
     };
 
-    public static final int ID = 0;
     public static final int TITLE = 1;
     public static final int DATE = 2;
     public static final int AUTHOR = 3;
@@ -54,13 +49,19 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
 
     private boolean firstClick = true;
 
-    Button mButtonListen;
     ImageButton mPlayButton;
     ImageButton mSkipForwardButton;
     ImageButton mSkipBackwardButton;
+    SeekBar mSeekBar;
+    TextView mCurrentTime;
+    TextView mDuration;
+    private Handler myHandler = new Handler();
 
 
     String imageUrl;
+    String title;
+    int currentPlayTime;
+    int duration;
 
     private Uri mUri;
 
@@ -79,18 +80,44 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         mPlayButton = (ImageButton)findViewById(R.id.play_button);
         mSkipBackwardButton = (ImageButton)findViewById(R.id.skip_back_button);
         mSkipForwardButton = (ImageButton)findViewById(R.id.skip_forward_button);
-
+        mSeekBar = (SeekBar)findViewById(R.id.seek_bar_podcast);
+        mCurrentTime = (TextView) findViewById(R.id.textCurrentPlayTime);
+        mDuration = (TextView) findViewById(R.id.textDurationPlayTime);
+        mDuration.setVisibility(View.INVISIBLE);
         Intent intent = getIntent();
+        currentPlayTime = 0;
+
 
         mUri = intent.getData();
 
         getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
+
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(serviceBound && fromUser){
+                    currentPlayTime = progress;
+                    player.moveToPosition(currentPlayTime);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         outState.putBoolean("ServiceState",serviceBound);
+        outState.putInt("CurrentTime",currentPlayTime);
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
@@ -105,7 +132,9 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         super.onDestroy();
         if(serviceBound){
             unbindService(serviceConnection);
+            player.removeNotification();
             player.stopSelf();
+            myHandler.removeCallbacks(UpdateMediaTime);
         }
     }
 
@@ -115,7 +144,17 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
             MediaPlayerService.LocalBinder binder = (MediaPlayerService.LocalBinder) service;
             player = binder.getService();
             serviceBound = true;
+            mCurrentTime.setText(R.string.time_zero);
+            mDuration.setText(R.string.time_zero);
+            duration = player.getDuration();
+            //String time = AntiochUtilties.getFormattedPlayTimeString(duration);
+            //mDuration.setText(time);
+            mDuration.setVisibility(View.VISIBLE);
+            //Toast.makeText(getApplicationContext(),String.valueOf(duration),Toast.LENGTH_LONG).show();
+            mSeekBar.setMax(duration);
+            myHandler.postDelayed(UpdateMediaTime,100);
         }
+
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -128,7 +167,7 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         if(!serviceBound){
             Intent playerIntent = new Intent(this, MediaPlayerService.class);
             playerIntent.putExtra("media",media);
-            playerIntent.putExtra("image",imageUrl);
+            playerIntent.putExtra("title",title);
             startService(playerIntent);
             bindService(playerIntent,serviceConnection, Context.BIND_AUTO_CREATE);
         }
@@ -158,7 +197,7 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         if(!cursorHasData)
             return;
 
-        String title = data.getString(TITLE);
+        title = data.getString(TITLE);
         String date = data.getString(DATE);
         String authorId = data.getString(AUTHOR);
         String summary = data.getString(SUMMARY);
@@ -170,7 +209,7 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         mDetailBinding.tvDetailDate.setText(date);
         mDetailBinding.tvDetailAuthor.setText(author);
         mDetailBinding.tvDetailDescription.setText(summary);
-        if(imageUrl == ""){
+        if(imageUrl.equals("")){
             mDetailBinding.ivDetailImage.setImageResource(R.mipmap.ic_launcher);
         }else {
             Picasso.with(this).load(imageUrl).placeholder(R.mipmap.ic_launcher).into(mDetailBinding.ivDetailImage);
@@ -211,4 +250,21 @@ public class PodcastDetail extends AppCompatActivity implements LoaderManager.Lo
         if(player.getStatus())
             player.skipToPrevious();
     }
+
+    private Runnable UpdateMediaTime = new Runnable() {
+        @Override
+        public void run() {
+            if(serviceBound && player.getStatus()) {
+                currentPlayTime = player.getCurrentPosition();
+                mCurrentTime.setText(AntiochUtilties.getFormattedPlayTimeString(currentPlayTime));
+                if(duration != player.getDuration()) {
+                    duration = player.getDuration();
+                    mDuration.setText(AntiochUtilties.getFormattedPlayTimeString(player.getDuration()));
+                    mSeekBar.setMax(player.getDuration());
+                }
+                mSeekBar.setProgress(currentPlayTime);
+            }
+            myHandler.postDelayed(UpdateMediaTime, 100);
+        }
+    };
 }

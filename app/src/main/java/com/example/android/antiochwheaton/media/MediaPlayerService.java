@@ -31,9 +31,6 @@ import com.squareup.picasso.Target;
 
 import java.io.IOException;
 
-/**
- * Created by ryan_ on 7/25/2017.
- */
 
 public class MediaPlayerService extends Service implements MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnSeekCompleteListener,
@@ -65,8 +62,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private static final int NOTIFICATION_ID = 101;
 
     String imageUrl;
+    String title;
 
-    public enum PlaybackStatus{
+    private enum PlaybackStatus{
         PLAYING,
         PAUSED
     }
@@ -216,6 +214,18 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         mediaPlayer.seekTo(resumePosition);
     }
 
+    public void moveToPosition(int position){
+        mediaPlayer.seekTo(position);
+    }
+
+    public int getCurrentPosition(){
+        return mediaPlayer.getCurrentPosition();
+    }
+
+    public int getDuration(){
+        return mediaPlayer.getDuration();
+    }
+
     public void resumeMedia(){
         if(!mediaPlayer.isPlaying()){
             mediaPlayer.seekTo(resumePosition);
@@ -248,10 +258,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     private boolean requestAudioFocus(){
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
-            return true;
-        }
-        return false;
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
     private boolean removeAudioFocus(){
@@ -262,12 +269,12 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             mediaFile = intent.getExtras().getString("media");
-            imageUrl = intent.getExtras().getString("image");
+            title = intent.getExtras().getString("title");
         }catch (NullPointerException e){
             stopSelf();
         }
 
-        if (requestAudioFocus() == false){
+        if (!requestAudioFocus()){
             stopSelf();
         }
 
@@ -418,9 +425,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             play_pauseAction = playbackAction(0);
         }
 
-        if(imageUrl == ""){
+        if(imageUrl.equals("")){
             image = BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher);
-        }else{
+        }else {
             Picasso.with(this).load(imageUrl).into(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -448,7 +455,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                 .setColor(getResources().getColor(R.color.colorPrimary))
                 .setLargeIcon(largeIcon)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Colossians 4")
+                .setContentTitle(title)
                 .addAction(android.R.drawable.ic_media_rew, "prevoius",playbackAction(2))
                 .addAction(notificationAction, "pause",play_pauseAction)
                 .addAction(android.R.drawable.ic_media_ff, "next",playbackAction(3));
@@ -457,7 +464,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                 notificationBuilder.build());
     }
 
-    private void removeNotification(){
+    public void removeNotification(){
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
     }
@@ -500,4 +507,6 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             transportControls.skipToNext();
         }
     }
+
+
 }

@@ -25,7 +25,7 @@ import com.example.android.antiochwheaton.sync.AntiochSyncUtils;
 
 public class SermonFragment extends Fragment implements
         PodcastAdapter.PodcastAdapterOnClickHandler, LoaderManager.LoaderCallbacks<Cursor>{
-    // TODO: Rename parameter arguments, choose names that match
+    // done: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
 

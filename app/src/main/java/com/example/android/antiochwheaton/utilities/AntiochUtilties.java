@@ -5,38 +5,14 @@ import android.database.Cursor;
 
 import com.example.android.antiochwheaton.data.DataContract;
 
-/**
- * Created by Ryan on 6/6/2017.
- */
 
 public class AntiochUtilties {
 
-    public static String formattedURL(String url){
-        String returnString = url.replace("\\","");
-        return returnString;
+
+    static String formattedURL(String url){
+        return url.replace("\\","");
     }
 
-    public static String formattedImageURL(String content){
-        String[] items = content.split(" ");
-        String s;
-        for(int i = 0; i < items.length;i++){
-            s = items[i];
-        }
-        String returnString = items[12];
-        return returnString;
-    }
-
-
-    public static String formattedSummaryURL(String content){
-        String[] items = content.split("p>");
-        String s;
-        for(int i = 0;i < items.length;i++){
-            s = items[i];
-        }
-
-        String returnString = items[1];
-        return returnString;
-    }
 
     public static String getAuthor(Context context, String authorId){
         Cursor tagsCursor = context.getContentResolver().query(DataContract.TagsEntry.buildTagsUriWithId(authorId),
@@ -67,22 +43,45 @@ public class AntiochUtilties {
         return imageURL;
     }
 
-    public static String getFormattedDate(String date){
+    //formatted date for meta only
+    static String getFormattedDate(String date){
         String[] dates = date.split("-");
 
-        String months[] = new String[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
+        String months[] = new String[]{"","January","February","March","April","May","June","July","August","September","October","November","December"};
         int dayInt = Integer.valueOf(dates[0]);
         int monthInt = Integer.valueOf(dates[1]);
         String year = dates[2];
         String month = months[monthInt];
 
-        String newdate = month + " " + String.valueOf(dayInt) + ", " + year;
-
-        return newdate;
+        return month + " " + String.valueOf(dayInt) + ", " + year;
 
     }
 
-    public static String getFormattedSummary(String oldSummary){
+    static String getFormattedJsonDate(String date){
+        String[] dates = date.split("-");
+
+        String months[] = new String[]{"","January","February","March","April","May","June","July","August","September","October","November","December"};
+        String[] day = dates[2].split("T");
+        int dayInt = Integer.valueOf(day[0]);
+        int monthInt = Integer.valueOf(dates[1]);
+        String year = dates[0];
+        String month = months[monthInt];
+
+        return month + " " + String.valueOf(dayInt) + ", " + year;
+    }
+
+    static String getFormattedSummary(String oldSummary){
        return oldSummary.substring(3,oldSummary.length()-6);
+    }
+
+    public static String getFormattedPlayTimeString(int time){
+        time = time/1000;
+        int minutes = time/60;
+        int seconds = time%60;
+
+        String strMinutes = minutes<10?"0"+String.valueOf(minutes):String.valueOf(minutes);
+        String strSeconds = (seconds<10?"0":"")+String.valueOf(seconds);
+
+        return strMinutes + ":" + strSeconds;
     }
 }

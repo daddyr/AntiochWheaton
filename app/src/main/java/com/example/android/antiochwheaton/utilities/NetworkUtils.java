@@ -42,7 +42,7 @@ public final class NetworkUtils {
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
     private static final String STATIC_WEATHER_URL =
-            "https://antiochwheaton.com/wp-json/wp/v2/";
+            "https://antiochwheaton.com/wp-json/";
 
     private static final String FORECAST_BASE_URL = STATIC_WEATHER_URL;
 
